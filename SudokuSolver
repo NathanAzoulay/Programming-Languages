@@ -1,0 +1,63 @@
+// solution coded in Java
+
+class Solution {
+    public void solveSudoku(char[][] board) {
+       
+        Set<Character>[] cols = new Set[board[0].length];
+        Set<Character>[] rows = new Set[board.length];
+        Set<Character>[] boxes = new Set[board.length];
+        
+        int n = board.length;
+        
+        for (int i = 0; i < n; i++) {
+            rows[i] = new HashSet<Character>();
+            cols[i] = new HashSet<Character>();
+            boxes[i] = new HashSet<Character>();
+        }
+        
+        for (int i = 0; i < n * n; i++) {
+            int row = i / n;
+            int col = i % n;
+            int boxNum = 3 * (row / 3) + col / 3;
+
+            char curr = board[row][col];
+            if (curr != '.') {
+                rows[row].add(curr);
+                cols[col].add(curr);
+                boxes[boxNum].add(curr);
+            }
+        }
+        backTrack(board, 0, rows, cols, boxes);
+    }
+    
+    private boolean backTrack(char[][] board, int index, Set<Character>[] rows, Set<Character>[] cols, Set<Character>[] boxes) {
+        if (index == board.length * board.length) {
+            return true;
+        }
+        int row = index / board.length;
+        int col = index % board.length;
+
+        if (board[row][col] != '.') {
+            return backTrack(board, index + 1, rows, cols, boxes);
+        }
+        
+        int boxNum = 3 * (row / 3) + col / 3;
+        
+        for (char i = '1'; i <= '9'; i++) {
+            if (rows[row].contains(i) || cols[col].contains(i) || boxes[boxNum].contains(i)) continue;
+            rows[row].add(i);
+            cols[col].add(i);
+            boxes[boxNum].add(i);
+            board[row][col] = i;
+            boolean r = backTrack(board, index + 1, rows, cols, boxes);
+            if (r) return true;
+            rows[row].remove(i);
+            cols[col].remove(i);
+            boxes[boxNum].remove(i);
+        }
+        board[row][col] = '.';
+
+        return false;
+        
+    }
+}
